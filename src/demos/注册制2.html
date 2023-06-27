@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <div id="dom1"></div>
+      <div id="dom2"></div>
+    </div>
+    <script>
+      /* 
+         1. 进阶可以收集匿名函数
+      */
+      const effects = new Set()
+      let active
+
+      // 注册响应函数
+      function effect(fn) {
+        active = fn
+        fn()
+      }
+
+      const data = {
+        msg1: 'hi1',
+      }
+
+      // reactive
+      const reactive = new Proxy(data, {
+        get(target, key) {
+          // track 收集
+          effects.add(active)
+
+          return target[key]
+        },
+        set(target, key, value) {
+          target[key] = value
+
+          effects.forEach((fn) => fn())
+
+          return true
+        }
+      })
+
+      // 收集操作
+      effect(() => {
+        document.querySelector('#dom1').innerHTML = reactive.msg1
+      })
+    
+
+     // 设置触发相应的操作
+     setTimeout(() => {
+        reactive.msg1 = 1
+     }, 1000)
+
+    </script>
+  </body>
+</html>

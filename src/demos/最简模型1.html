@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+
+    <div id="root"></div>
+
+    <script>
+
+      const effects = new Set()
+
+      const data = {
+        msg: 'hi'
+      }
+
+      const reactive = new Proxy(data, {
+        set(target, key, value) {
+          console.log('拦截设置操作')
+          target[key] = value
+          // 执行相关的页面操作
+          effects.forEach((fn) => fn())
+        },
+        get(target, key) {
+          console.log('拦截读操作')
+          // 添加相关操作留给设置时执行
+          effects.add(effect)
+          return target[key]
+        }
+      })
+
+      function effect() {
+        // 第一次执行触发读取拦截，添加相关操作到 Set
+        document.querySelector('#root').innerHTML = reactive.msg
+      }
+
+
+      setTimeout(() => {
+        reactive.msg = 'hello'
+      }, 1000)
+
+      effect()
+
+    </script>
+  </body>
+</html>
