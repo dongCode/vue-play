@@ -26,12 +26,12 @@
           fn()
         }
         activeFn.effects = []
-        effectFn()
+        activeFn()
       }
 
       function cleanup(activeFn) {
-        for(let i = 0; i < activeFn.effects.length; i++) {
-          const effects = effectFn.effects[i]
+        for (let i = 0; i < activeFn.effects.length; i++) {
+          const effects = activeFn.effects[i]
           effects.delete(activeFn)
         }
         activeFn.effects.length = 0
@@ -87,9 +87,10 @@
         let mapKeys = effects.get(target)
 
         let keySetEffects = mapKeys?.get(key)
-
+        const effectsToRun = new Set()
+        keySetEffects && keySetEffects.forEach((effectFn) => effectsToRun.add(effectFn))
         if (keySetEffects) {
-          keySetEffects.forEach((fn) => fn())
+          effectsToRun.forEach((fn) => fn())
         }
       }
 

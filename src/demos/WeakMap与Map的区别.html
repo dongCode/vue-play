@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const weak = new WeakMap();
+      const map = new Map();
+
+      (function () {
+        const a = { a: 1 };
+        const b = { b: 2 };
+        weak.set(a, 1);
+        map.set(b, 1);
+      })();
+
+      console.log(map.keys()); // 1
+            console.log(weak); // 1
+
+    </script>
+  </body>
+</html>
