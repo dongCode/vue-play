@@ -36,7 +36,23 @@
           if (!active) {
             return target[key]
           } else {
-            // effects ->WeakMap target -> Map key ->Set  effects
+            track(target,key)
+            return target[key]
+          }
+        },
+        set(target, key, value) {
+
+          target[key] = value
+
+          trigger(target,key)
+          
+          return true
+          
+        }
+      })
+      // 读操作的记录不同target的不同key对应的effect
+      function track (target,key) {
+         // effects ->WeakMap target -> Map key ->Set  effects
             let mapKeys = effects.get(target)
 
             // 对应的target不存在
@@ -51,15 +67,9 @@
             }
 
             keySetEffect.add(active)
-
-
-            return target[key]
-          }
-        },
-        set(target, key, value) {
-
-          target[key] = value
-
+      }
+      // trigger 触发设置时的effect
+      function trigger(target,key) {
           let mapKeys = effects.get(target)
 
           let keySetEffects = mapKeys?.get(key)
@@ -67,11 +77,7 @@
           if (keySetEffects) {
             keySetEffects.forEach((fn) => fn())
           }
-
-          return true
-          
-        }
-      })
+      }
 
       // 收集操作
       effect(() => {
