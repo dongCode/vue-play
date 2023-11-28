@@ -33,6 +33,14 @@ const router = createRouter({
       meta: {
         title: 'ToDo'
       }
+    },
+    {
+      path: '/debounce',
+      name: 'debounce',
+      component: () => import('../views/debounce.vue'),
+      meta: {
+        title: 'Debounce'
+      }
     }
   ]
 })

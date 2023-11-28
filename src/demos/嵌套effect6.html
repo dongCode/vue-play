@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <div id="dom1"></div>
+      <div id="dom2"></div>
+    </div>
+    <script>
+      /* 
+         1. 进阶可以收集匿名函数
+      */
+      const effects = new WeakMap()
+      const effectStack = []
+      let active
+
+      // 注册响应函数
+      function effect(fn) {
+        const activeFn = () => {
+          cleanup(activeFn)
+          active = activeFn
+          effectStack.push(activeFn)
+          fn()
+          effectStack.pop()
+          active = effectStack[effectStack.length - 1]
+        }
+        activeFn.effects = []
+        activeFn()
+      }
+
+      function cleanup(activeFn) {
+        for (let i = 0; i < activeFn.effects.length; i++) {
+          const effects = activeFn.effects[i]
+          effects.delete(activeFn)
+        }
+        activeFn.effects.length = 0
+      }
+
+      const data = {
+        msg1: 'hi1',
+        msg2: 'hi2'
+      }
+
+      // reactive
+      const reactive = new Proxy(data, {
+        get(target, key) {
+          if (!active) {
+            return target[key]
+          } else {
+            track(target, key)
+            return target[key]
+          }
+        },
+
+        set(target, key, value) {
+          target[key] = value
+
+          trigger(target, key)
+
+          return true
+        }
+      })
+      // 读操作的记录不同target的不同key对应的effect
+      function track(target, key) {
+        // effects ->WeakMap target -> Map key ->Set  effects
+        let mapKeys = effects.get(target)
+
+        // 对应的target不存在
+        if (!mapKeys) {
+          effects.set(target, (mapKeys = new Map()))
+        }
+
+        let keySetEffect = mapKeys.get(key)
+        // 对应的key Set不存在
+        if (!keySetEffect) {
+          mapKeys.set(key, (keySetEffect = new Set()))
+        }
+
+        keySetEffect.add(active)
+        active.effects.push(keySetEffect)
+      }
+
+      // trigger 触发设置时的effect
+      function trigger(target, key) {
+        let mapKeys = effects.get(target)
+
+        let keySetEffects = mapKeys?.get(key)
+        const effectsToRun = new Set()
+        keySetEffects && keySetEffects.forEach((effectFn) => effectsToRun.add(effectFn))
+        if (keySetEffects) {
+          effectsToRun.forEach((fn) => fn())
+        }
+      }
+
+      let temp1, temp2
+      effect(() => {
+        console.log('first')
+        effect(() => {
+          console.log('second')
+          temp1 = reactive.msg2
+        })
+        temp2 = reactive.msg1
+      })
+
+      reactive.msg1 = '2'
+    </script>
+  </body>
+</html>

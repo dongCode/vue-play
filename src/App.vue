@@ -3,7 +3,8 @@ import { RouterLink, RouterView } from 'vue-router'
 import { useTitle, useMouse } from './hooks'
 import { AModal } from './components'
 import HelloWorld from './components/HelloWorld.vue'
-import { ref } from 'vue';
+import { ref } from 'vue'
+
 useTitle()
 const { x, y } = useMouse()
 const show = ref(false)
@@ -20,20 +21,17 @@ const toggle = () => {
       <HelloWorld msg="You did it!" />
 
       <nav>
-        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/">CSS</RouterLink>
         <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/todo">ToDo</RouterLink>
-
+        <RouterLink to="/debounce">Debounce</RouterLink>
       </nav>
       鼠标位置{{ x }}, {{ y }}
     </div>
 
-    <AModal @close="toggle" :show="show" title="简单modal">
-      test
-    </AModal>
+    <AModal @close="toggle" :show="show" title="简单modal"> test </AModal>
 
     <button @click="toggle">toggle</button>
-
   </header>
   <RouterView />
 </template>
