@@ -4,7 +4,7 @@ import { useTitle, useMouse } from './hooks'
 import { AModal } from './components'
 import HelloWorld from './components/HelloWorld.vue'
 import { ref } from 'vue'
-
+import Parent from './views/Parent.vue'
 useTitle()
 const { x, y } = useMouse()
 const show = ref(false)
@@ -28,7 +28,7 @@ const toggle = () => {
       </nav>
       鼠标位置{{ x }}, {{ y }}
     </div>
-
+    <Parent />
     <AModal @close="toggle" :show="show" title="简单modal"> test </AModal>
 
     <button @click="toggle">toggle</button>
